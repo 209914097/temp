@@ -1,0 +1,108 @@
+from PIL import Image
+import os
+import requests
+from requests import get,post,Session
+"""dowloan()函数用到requests"""
+import sys
+
+
+def biting(imgpath,threshold):
+    """传入image对象进行灰度、二值处理
+    imgpath:图片路径
+    threshold:阀值
+    """
+    img = Image.open(imgpath)
+    img = img.convert("L") # 转灰度
+    pixdata = img.load()
+    w, h = img.size
+    # 遍历所有像素，大于阈值的为黑色
+    for y in range(h):
+        for x in range(w):
+            if pixdata[x, y] < threshold:
+                pixdata[x, y] = 0
+            else:
+                pixdata[x, y] = 255
+    return img
+
+def getimgtable(imgpath):
+    img = Image.open(imgpath)
+    table=[]
+    pixdata = img.load()
+    w, h=img.size
+    for y in range(h):
+        for x in range(w):
+            if pixdata[x, y]== 0:
+                table.append('1')
+            elif pixdata[x, y]== 255:
+                table.append('0')
+        table.append('\n')
+    return table
+
+def creatfile(data):
+    string = "".join(data)
+    with open('D.txt', 'w') as f:
+        f.write(string)
+        print("创建文件成功")
+
+
+def scissor(imgpath):
+    """实现剪切图片"""
+    center=[16,29,43,59]
+    if (os.path.exists('E:/桌面文件/one/num')!=True):
+        os.makedirs('E:/桌面文件/one/num')
+    imgname=imgpath.split('.')
+    img = Image.open(imgpath)
+    for x in range(4):
+        box = (center[x] - 7, 11, center[x] + 7, 35)
+        region = img.crop(box)
+        region.save('num/'+imgname[0]+'-'+str(x)+'.bmp')
+
+def download():
+    """下载验证码"""
+    for x in range(1000):
+        r = requests.get('http://219.216.96.73/pyxx/PageTemplate/NsoftPage/yzm/createyzm.aspx')
+        with open('dig/'+str(x)+'.gif', 'wb') as pic:
+            pic.write(r.content)
+"""
+for x in range(1000):
+    bit=biting('dig/'+str(x)+'.gif',88)
+    bit.save('dig_bmp88/'+str(x)+'.bmp')
+
+
+for x in range(1000):
+    scissor('dig_bmp88/'+str(x)+'.bmp')
+
+t = getimgtable('num/dig_bmp88/0-0.bmp')
+creatfile(t)
+"""
+post_url = 'http://219.216.96.73/pyxx/login.aspx'
+captchaurl = 'http://219.216.96.73/pyxx/PageTemplate/NsoftPage/yzm/createyzm.aspx'
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
+    'Referer': 'http://219.216.96.73/pyxx/login.aspx',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+
+}
+
+session = Session()
+checkcodecontent = session.get(captchaurl, headers=headers)
+with open('checkcode.gif', 'wb') as f:
+    f.write(checkcodecontent.content)
+print('验证码已写入到本地！')
+os.startfile('checkcode.gif')
+checkcode = input('请输入验证码：')
+post_data = {
+    '__VIEWSTATE':'/wEPDwUENTM4MWQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFEmN0bDAwJEltYWdlQnV0dG9uMS0nFEa6hHMvPk9e8UqDdLj9ClgECnCtpmFqIziOXB+0',
+    '__VIEWSTATEGENERATOR':'496CE0B8',
+    'ctl00$txtusername':'1700812',
+    'ctl00$txtpassword':'535470a',
+    'ctl00$txtyzm': checkcode,
+    'ctl00$ImageButton1.x':'30',
+    'ctl00$ImageButton1.y':'26',
+}
+
+response = session.post(post_url, data=post_data, headers=headers)
+login_code = response.text
+print('服务器端返回码： ', response.status_code)
+print(login_code)
