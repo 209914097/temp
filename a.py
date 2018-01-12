@@ -2,6 +2,7 @@ from PIL import Image
 import os
 import requests
 from requests import get,post,Session
+from bs4 import BeautifulSoup
 """dowloan()函数用到requests"""
 import sys
 
@@ -24,6 +25,7 @@ def biting(imgpath,threshold):
                 pixdata[x, y] = 255
     return img
 
+
 def getimgtable(imgpath):
     img = Image.open(imgpath)
     table=[]
@@ -37,6 +39,7 @@ def getimgtable(imgpath):
                 table.append('0')
         table.append('\n')
     return table
+
 
 def creatfile(data):
     string = "".join(data)
@@ -63,6 +66,60 @@ def download():
         r = requests.get('http://219.216.96.73/pyxx/PageTemplate/NsoftPage/yzm/createyzm.aspx')
         with open('dig/'+str(x)+'.gif', 'wb') as pic:
             pic.write(r.content)
+
+
+def login():
+    """做了一些微小的贡献，还需要修改一下"""
+    post_url = 'http://219.216.96.73/pyxx/login.aspx'
+    captchaurl = 'http://219.216.96.73/pyxx/PageTemplate/NsoftPage/yzm/createyzm.aspx'
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
+        'Referer': 'http://219.216.96.73/pyxx/login.aspx',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+    }
+    session = Session()
+    checkcodecontent = session.get(captchaurl, headers=headers)
+    with open('checkcode.gif', 'wb') as f:
+        f.write(checkcodecontent.content)
+    print('验证码已写入到本地！')
+    os.startfile('checkcode.gif')
+    checkcode = input('请输入验证码：')
+    post_data = {
+        '__VIEWSTATE': '/wEPDwUENTM4MWQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFEmN0bDAwJEltYWdlQnV0dG9uMS0nFEa6hHMvPk9e8UqDdLj9ClgECnCtpmFqIziOXB+0',
+        '__VIEWSTATEGENERATOR': '496CE0B8',
+        'ctl00$txtusername': '1700651',
+        'ctl00$txtpassword': '1700651',
+        'ctl00$txtyzm': checkcode,
+        'ctl00$ImageButton1.x': '30',
+        'ctl00$ImageButton1.y': '26',
+    }
+    response = session.post(post_url, data=post_data, headers=headers)
+    login_code = response.text
+    print('服务器端返回码： ', response.status_code)
+    """print(login_code)"""
+
+    get_url = 'http://219.216.96.73/pyxx/loging.aspx'
+    headers2 = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+        'Connection': 'keep-alive',
+        'Cookie': 'ASP.NET_SessionId=fovatpeslaij1rbalsiske0g',
+        'Host': '219.216.96.73',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
+    }
+    html_doc = session.get(get_url, headers=headers)
+    """print(response2.text)"""
+    soup = BeautifulSoup(html_doc.text, "html.parser")
+    k = soup.find_all('span')
+    try:
+        print(k[28].get_text())
+    except IndexError:
+        print("密码错误登陆失败")
+
+
 """
 for x in range(1000):
     bit=biting('dig/'+str(x)+'.gif',88)
@@ -75,34 +132,5 @@ for x in range(1000):
 t = getimgtable('num/dig_bmp88/0-0.bmp')
 creatfile(t)
 """
-post_url = 'http://219.216.96.73/pyxx/login.aspx'
-captchaurl = 'http://219.216.96.73/pyxx/PageTemplate/NsoftPage/yzm/createyzm.aspx'
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
-    'Referer': 'http://219.216.96.73/pyxx/login.aspx',
-    'Accept-Encoding': 'gzip, deflate',
-    'Accept-Language': 'zh-CN,zh;q=0.9',
 
-}
-
-session = Session()
-checkcodecontent = session.get(captchaurl, headers=headers)
-with open('checkcode.gif', 'wb') as f:
-    f.write(checkcodecontent.content)
-print('验证码已写入到本地！')
-os.startfile('checkcode.gif')
-checkcode = input('请输入验证码：')
-post_data = {
-    '__VIEWSTATE':'/wEPDwUENTM4MWQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFEmN0bDAwJEltYWdlQnV0dG9uMS0nFEa6hHMvPk9e8UqDdLj9ClgECnCtpmFqIziOXB+0',
-    '__VIEWSTATEGENERATOR':'496CE0B8',
-    'ctl00$txtusername':'1700812',
-    'ctl00$txtpassword':'535470a',
-    'ctl00$txtyzm': checkcode,
-    'ctl00$ImageButton1.x':'30',
-    'ctl00$ImageButton1.y':'26',
-}
-
-response = session.post(post_url, data=post_data, headers=headers)
-login_code = response.text
-print('服务器端返回码： ', response.status_code)
-print(login_code)
+login()
