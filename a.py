@@ -1,11 +1,11 @@
 from PIL import Image
-import os
+from os import listdir   #sampledata函数用到
 import requests
 from requests import get,post,Session
-from bs4 import BeautifulSoup
 """dowloan()函数用到requests"""
-import sys
-
+from bs4 import BeautifulSoup
+"""login()函数用到BeautifulSoup"""
+from numpy import *
 
 def biting(imgpath,threshold):
     """传入image对象进行灰度、二值处理
@@ -42,15 +42,15 @@ def getimgtable(imgpath):
 
 
 def creatfile(data):
-    string = "".join(data)
-    with open('D.txt', 'w') as f:
+    string = "".join(data)#把list类型转换成str类型
+    with open('l.txt', 'w') as f:
         f.write(string)
         print("创建文件成功")
 
 
 def scissor(imgpath):
     """实现剪切图片"""
-    center=[16,29,43,59]
+    center = [16, 29, 43, 59]
     if (os.path.exists('E:/桌面文件/one/num')!=True):
         os.makedirs('E:/桌面文件/one/num')
     imgname=imgpath.split('.')
@@ -59,6 +59,7 @@ def scissor(imgpath):
         box = (center[x] - 7, 11, center[x] + 7, 35)
         region = img.crop(box)
         region.save('num/'+imgname[0]+'-'+str(x)+'.bmp')
+
 
 def download():
     """下载验证码"""
@@ -124,13 +125,42 @@ def login():
 for x in range(1000):
     bit=biting('dig/'+str(x)+'.gif',88)
     bit.save('dig_bmp88/'+str(x)+'.bmp')
-
-
 for x in range(1000):
     scissor('dig_bmp88/'+str(x)+'.bmp')
-
-t = getimgtable('num/dig_bmp88/0-0.bmp')
+l=martixtoline('D.txt')
+creatfile(str(l[0,::]))
+t = getimgtable('num/dig_bmp88/0-1.bmp')
 creatfile(t)
-"""
 
-login()
+L, M = sampledata()
+print(L)
+print(M[1][56:70])
+
+"""
+def martixtoline(filename):
+    """把矩阵转化为一个行向量"""
+    line = zeros((1,336))#336是验证码图片剪切成单个数字后，单个数字图片的像素14x24
+    f = open(filename)
+    for i in range(24):
+        linestr = f.readline()
+        for j in range(14):
+            line[0,14*i+j] = int(linestr[j])
+    return line
+
+
+def sampledata():  #该函数用于把样本数据转化成array类型，以便在numpy中运算
+    Labels = []
+    FileList = listdir('sampledata')           #load the training set
+    m = len(FileList)
+    Mat = zeros((m,336))    #336是验证码图片剪切成单个数字后，单个数字图片的像素14x24
+    for i in range(m):
+        fileNameStr = FileList[i]
+        fileStr = fileNameStr.split('.')[0]     #take off .txt
+        classNumStr = int(fileStr.split('-')[0])
+        Labels.append(classNumStr)  #正确答案
+        Mat[i,:] = martixtoline('sampledata/%s' % fileNameStr)
+    return Labels,Mat
+
+
+
+
