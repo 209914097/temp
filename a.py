@@ -41,9 +41,9 @@ def getimgtable(imgpath):
     return table
 
 
-def creatfile(data):
+def creatfile(data,filename):
     string = "".join(data)#把list类型转换成str类型
-    with open('l.txt', 'w') as f:
+    with open(filename, 'w') as f:
         f.write(string)
         print("创建文件成功")
 
@@ -122,20 +122,27 @@ def login():
 
 
 """
-for x in range(1000):
+#以下是调试开发用到的一些小工具
+for j in range(9):#该循环用于批量重命名
+    flist=os.listdir(str(j))
+    for x in range(len(flist)):
+            fileNameStr = flist[x]
+            os.rename(str(j)+'/'+flist[x],str(j)+'/'+str(j)+'-'+str(x)+'.bmp')
+            
+for x in range(1000):#该循环用于批量二值化
     bit=biting('dig/'+str(x)+'.gif',88)
     bit.save('dig_bmp88/'+str(x)+'.bmp')
-for x in range(1000):
+for x in range(1000):#该循环用于批量剪切
     scissor('dig_bmp88/'+str(x)+'.bmp')
+for x in range(442):#该循环用于批量生成数字矩阵TXT文本
+    t = getimgtable('8/8-'+str(x)+'.bmp')
+    creatfile(t,'ntxt/8/8'+'-'+str(x)+'.txt')
+    
 l=martixtoline('D.txt')
 creatfile(str(l[0,::]))
-t = getimgtable('num/dig_bmp88/0-1.bmp')
-creatfile(t)
-
 L, M = sampledata()
 print(L)
 print(M[1][56:70])
-
 """
 def martixtoline(filename):
     """把矩阵转化为一个行向量"""
@@ -160,7 +167,5 @@ def sampledata():  #该函数用于把样本数据转化成array类型，以便�
         Labels.append(classNumStr)  #正确答案
         Mat[i,:] = martixtoline('sampledata/%s' % fileNameStr)
     return Labels,Mat
-
-
 
 
