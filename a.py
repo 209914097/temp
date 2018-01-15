@@ -1,12 +1,13 @@
 from PIL import Image
 from os import listdir   #sampledata函数用到
 import requests
+import os
 from requests import get,post,Session
 """dowloan()函数用到requests"""
 from bs4 import BeautifulSoup
 """login()函数用到BeautifulSoup"""
 from numpy import *
-
+import operator #classify0()函数用到
 def biting(imgpath,threshold):
     """传入image对象进行灰度、二值处理
     imgpath:图片路径
@@ -124,7 +125,7 @@ def login():
 """
 #以下是调试开发用到的一些小工具
 for j in range(9):#该循环用于批量重命名
-    flist=os.listdir(str(j))
+    flist=os.listdir(str(j)) #获取文件个数
     for x in range(len(flist)):
             fileNameStr = flist[x]
             os.rename(str(j)+'/'+flist[x],str(j)+'/'+str(j)+'-'+str(x)+'.bmp')
@@ -168,4 +169,58 @@ def sampledata():  #该函数用于把样本数据转化成array类型，以便�
         Mat[i,:] = martixtoline('sampledata/%s' % fileNameStr)
     return Labels,Mat
 
+def classify0(inX, dataSet, labels, k):#KNN算法函数
+    dataSetSize = dataSet.shape[0]
+    diffMat = tile(inX, (dataSetSize,1)) - dataSet
+    sqDiffMat = diffMat**2
+    sqDistances = sqDiffMat.sum(axis=1)
+    distances = sqDistances**0.5
+    sortedDistIndicies = distances.argsort()
+    classCount={}
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndicies[i]]
+        classCount[voteIlabel] = classCount.get(voteIlabel,0) + 1
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
 
+"""#下载验证码识别测试
+post_url = 'http://219.216.96.73/pyxx/login.aspx'
+captchaurl = 'http://219.216.96.73/pyxx/PageTemplate/NsoftPage/yzm/createyzm.aspx'
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
+    'Referer': 'http://219.216.96.73/pyxx/login.aspx',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+}
+session = Session()
+checkcodecontent = session.get(captchaurl, headers=headers)
+with open('checkcode.gif', 'wb') as f:
+    f.write(checkcodecontent.content)
+print('验证码已写入到本地！')
+os.startfile('checkcode.gif')
+bit=biting('checkcode.gif',88)
+bit.save('checkcode.bmp')
+scissor('checkcode.bmp')
+for x in range(4):
+    t = getimgtable('num/checkcode-' + str(x) + '.bmp')
+    creatfile(t, 'num/checkcode-' + str(x) + '.txt')
+answer=''
+L,M = sampledata()
+for x in range(4):
+    test = martixtoline('num/checkcode-' + str(x) + '.txt')
+    answer = answer+str(classify0(test,M,L,3))
+print(answer)
+"""
+"""
+#测试条件样本数据0-8，每个100个，测试数据0-8，每个100个
+#若样本数据0-8，每个50个，测试数据0-8，每个100个，则开始出现识别错误
+err=0
+L,M = sampledata()
+for x in range(100):
+    test = martixtoline('num/8/'+'8-'+str(x)+'.txt')
+    answer = str(classify0(test, M, L, 3))
+    print(answer)
+    if answer!='8':
+        err=err+1
+print('错误个数：'+str(err))
+"""
