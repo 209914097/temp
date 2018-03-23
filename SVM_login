@@ -1,0 +1,77 @@
+from PIL import Image
+from os import listdir  # sampledata函数用到
+import requests
+import os
+from requests import get, post, Session
+"""dowloan()函数用到requests"""
+from bs4 import BeautifulSoup
+
+def download():
+    """下载验证码"""
+    for x in range(1500):
+        r = requests.get('https://zhjw.neu.edu.cn/ACTIONVALIDATERANDOMPICTURE.APPPROCESS')
+        with open('dig/' + str(x) + '.jpg', 'wb') as pic:
+            pic.write(r.content)
+
+def biting(imgpath, threshold):
+    """传入image对象进行灰度、二值处理
+    imgpath:图片路径
+    threshold:阀值
+    """
+    img = Image.open(imgpath)
+    img = img.convert("L")  # 转灰度
+    pixdata = img.load()  #读取图片像素RGB数值
+    w, h = img.size    #获取图片尺寸大小，即长宽像素
+    # 遍历所有像素，大于阈值的为黑色
+    for y in range(h):
+        for x in range(w):
+            if pixdata[x, y] < threshold:   #像素小于阀值，置为0，图片变为黑白图
+                pixdata[x, y] = 0
+            else:
+                pixdata[x, y] = 255
+    return img
+
+def scissor(imgpath):
+    """实现剪切图片"""
+    center = [10, 24, 37]  #验证码图片3个数字的重心
+    if (os.path.exists('dig') != True):
+        os.makedirs('dig')
+    imgname = imgpath.split('.')[0].split('/')
+    img = Image.open(imgpath)
+    for x in range(3):
+        box = (center[x] - 7, 0, center[x] + 7, 18)
+        region = img.crop(box)  #进行图片剪切，box(a,b,c,d)参数为宽从像素a到b，高从像素c到d
+        region.save('dig/cut/bmp' + imgname[2] + '-' + str(x) + '.bmp')
+
+
+# download()
+for x in range(1500):#该循环用于批量二值化
+    # bit=biting('dig/'+str(x)+'.jpg',140)
+    # bit.save('dig/bit/'+str(x)+'.bmp')
+    scissor('dig/bit/'+str(x)+'.bmp')
+
+
+"""
+#以下是调试开发用到的一些小工具
+import os #批量创建文件夹
+for x in range(9):
+    os.makedirs(str(x))
+for j in range(9):#该循环用于批量重命名
+    flist=os.listdir(str(j)) #获取文件个数
+    for x in range(len(flist)):
+            fileNameStr = flist[x]
+            os.rename(str(j)+'/'+flist[x],str(j)+'/'+str(j)+'-'+str(x)+'.bmp')
+for x in range(1000):#该循环用于批量二值化
+    bit=biting('dig/'+str(x)+'.gif',88)
+    bit.save('dig_bmp88/'+str(x)+'.bmp')
+for x in range(1000):#该循环用于批量剪切
+    scissor('dig_bmp88/'+str(x)+'.bmp')
+for x in range(442):#该循环用于批量生成数字矩阵TXT文本
+    t = getimgtable('8/8-'+str(x)+'.bmp')
+    creatfile(t,'ntxt/8/8'+'-'+str(x)+'.txt')
+l=martixtoline('D.txt')
+creatfile(str(l[0,::]))
+L, M = sampledata()
+print(L)
+print(M[1][56:70])
+"""
