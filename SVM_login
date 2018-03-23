@@ -45,33 +45,70 @@ def scissor(imgpath):
 
 
 # download()
-for x in range(1500):#该循环用于批量二值化
+# for x in range(1500):#该循环用于批量二值化
     # bit=biting('dig/'+str(x)+'.jpg',140)
     # bit.save('dig/bit/'+str(x)+'.bmp')
-    scissor('dig/bit/'+str(x)+'.bmp')
+    # scissor('dig/bit/'+str(x)+'.bmp')
 
+def login(username):
+    """做了一些微小的贡献,并且按照基本法修改成功"""
+    post_url = 'https://zhjw.neu.edu.cn/ACTIONLOGON.APPPROCESS?mode=4'
+    captchaurl = 'https://zhjw.neu.edu.cn/ACTIONVALIDATERANDOMPICTURE.APPPROCESS'
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
+        'Referer': 'https://zhjw.neu.edu.cn/ACTIONLOGON.APPPROCESS?mode=3',
+        'Accept-Encoding': 'gzip, deflate,br',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+    }
+    session = Session()
+    checkcodecontent = session.get(captchaurl, headers=headers)
+    with open('checkcode.jpg', 'wb') as f:
+        f.write(checkcodecontent.content)
+    print('验证码已写入到本地！')
 
-"""
-#以下是调试开发用到的一些小工具
-import os #批量创建文件夹
-for x in range(9):
-    os.makedirs(str(x))
-for j in range(9):#该循环用于批量重命名
-    flist=os.listdir(str(j)) #获取文件个数
-    for x in range(len(flist)):
-            fileNameStr = flist[x]
-            os.rename(str(j)+'/'+flist[x],str(j)+'/'+str(j)+'-'+str(x)+'.bmp')
-for x in range(1000):#该循环用于批量二值化
-    bit=biting('dig/'+str(x)+'.gif',88)
-    bit.save('dig_bmp88/'+str(x)+'.bmp')
-for x in range(1000):#该循环用于批量剪切
-    scissor('dig_bmp88/'+str(x)+'.bmp')
-for x in range(442):#该循环用于批量生成数字矩阵TXT文本
-    t = getimgtable('8/8-'+str(x)+'.bmp')
-    creatfile(t,'ntxt/8/8'+'-'+str(x)+'.txt')
-l=martixtoline('D.txt')
-creatfile(str(l[0,::]))
-L, M = sampledata()
-print(L)
-print(M[1][56:70])
-"""
+    checkcode = input('验证码')
+    # bit = biting('checkcode.gif', 140)  #88是阀值，去除验证码干扰线和随机噪声点
+    # bit.save('checkcode.bmp')
+    # scissor('checkcode.bmp')
+
+    # for x in range(4):
+    #     t = getimgtable('num/checkcode-' + str(x) + '.bmp')
+    #     creatfile(t, 'num/checkcode-' + str(x) + '.txt')
+    # L, M = sampledata()  #返回样本的标签和样本标签对应的数阵
+    # for x in range(4):
+    #     test = martixtoline('num/checkcode-' + str(x) + '.txt')  #把要验证的数字转化为行向量
+    #     checkcode = checkcode + str(classify0(test, M, L, 3))    #验证码识别
+
+    post_data = {
+        'WebUserNO': username,
+        'Password': username,
+        'Agnomen': checkcode,
+        'submit.x': 25,
+        'submit.y': 9,
+    }
+    # """以下三行代码
+    # 获取默认页http://219.216.96.73/pyxx/Default.aspx的html
+    # 一旦post_url = 'http://219.216.96.73/pyxx/login.aspx'被正确的密码验证码登录，连接会被服务器重定向至默认页，即
+    # http://219.216.96.73/pyxx/Default.aspx它实际是一个多个frame组成的网页，从状态码302 Found可以看出
+    # """
+    response = session.post(post_url, data=post_data, headers=headers)
+    # print('服务器端返回码： ', response.status_code)
+    default_htmldoc = BeautifulSoup(response.text, "html.parser")
+    script = default_htmldoc.find_all('script')
+    print(script[1].get_text())
+    # """以下代码获取信息学号姓名导师信息的网页"""
+    # get_url = 'http://219.216.96.73/pyxx/loging.aspx'
+    # loging_htmldoc = session.get(get_url, headers=headers)
+    #
+    # script = default_htmldoc.find_all('script')
+    # try:
+    #     if (script[5].get_text() == "alert('密码错误!')"):
+    #         return ('密码错误 登陆失败')
+    #     elif (script[5].get_text() == "alert('你输入的验证码错误！')"):
+    #         return ('验证码识别出错')
+    #     elif (script[5].get_text() == "alert('该学生档案已转入存档,不能登录本系统!')"):
+    #         return ('该学生档案已转入存档,不能登录本系统!')
+    # except IndexError:
+    #     soup = BeautifulSoup(loging_htmldoc.text, "html.parser")
+    #     span = soup.find_all('span')
+    #     return (span[28].get_text())  #返回HTML文档中第28个<span>标签的文本内容
