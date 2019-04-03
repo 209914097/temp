@@ -1,56 +1,39 @@
 import sys
 import math
-def dis(l1,l2):
-  r=list(map(lambda a,b:a-b,l1,l2 ))
-  r=[k*k for k in r]
-  r=math.sqrt(sum(r))
-  return r
+s=sys.stdin.readlines()
+i=int(s[0].strip())
+ss=s[1::]
+for slist in ss:
+    numlist=list(map(int,slist.strip().split(' ')))
+    first=numlist[0]
+    second=numlist[1]
+    third=numlist[2]
+    four=numlist[3]
+    ans=four+math.floor(second/2)+min(first,third)
+    second = second-2*math.floor(second/2)
+    third =third -min(first,third)
+    first = first-min(first,third)
 
+    if second>0 and first>=2:
+        ans+=second
+        first=first-second*2
+    ans +=math.floor(first/4)
+    print(ans)
 
-def in_list(si):
-  tem=[]
-  inlist=[[0,0]]
-  for i,ss in list(enumerate(si)):
-    if i%2==1:
-      tem.append(int(ss))
-      inlist.append(tem)
-      tem=[]
-    else:
-      tem.append(int(ss))
-  return inlist
+"""
+第一行T表示组数，接下来T行，每行四个非负整数A,B,C,D
+input:
+4
+1 2 3 4
+4 3 2 1
+2 2 2 1
+0 2 0 1
 
-def sortdis(ordinal,comparelist):
-  distance_dic={}
-  for comparepoint in comparelist:
-    distance_dic[dis(ordinal,comparepoint)]=comparepoint
-    test_data_1 = sorted(distance_dic.items(), key=lambda x: x[0],reverse=False)
-  return test_data_1
+ouput:
+共T行，每行输出一个队伍数
+6
+5
+4
+2
+"""
 
-
-def iterbegin(inputlist,totaldistance ):
-  if len(inputlist )>1:
-    firstpoint = inputlist[0]
-    secondlist = inputlist[1::]
-    sortdislist=sortdis(firstpoint,secondlist)
-    totaldistance+=sortdislist[0][0]
-
-    secondlist =[item[1] for item in sortdislist[::]]
-    return iterbegin(secondlist,totaldistance)
-  else:
-    return totaldistance+dis(inputlist[0],[0,0])
-
-# print(iterbegin([[0,0],[200, 0], [200, 10], [200, 30], [200, 50], [200, 25]],0))
-
-
-si=sys.stdin.readlines()
-si=si[0].strip().split()
-
-print(int(iterbegin(in_list(si),0)))
-
-# [[200, 0], [200, 10], [200, 30], [200, 50], [200, 25]]
-#200 0 200 10 200 30 200 50 200 25
-#  456
-#两个list减
-# l1=[1,5,9]
-# l2=[2,4,7]
-# print(list(map(lambda a,b:a-b,l1,l2)))
