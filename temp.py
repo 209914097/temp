@@ -13,11 +13,14 @@
 # 10.01 拾元壹分
 # 10.10 拾元壹角
 # 10.1 拾元壹角
+# 100010.10 拾万零拾元壹角
+# 100020.10 拾万零贰拾元壹角
+# 200010.10 贰拾万零拾元壹角
 # 0.1 壹角
 # 0.10 壹角
 # 0.01 壹分
 # 10001000 壹仟万零壹仟元
-a=10.1
+a=200010.10
 intnum = str(a).split('.')[0]
 try:floatnum=str(a).split('.')[1]
 except:floatnum=''
@@ -29,23 +32,21 @@ money = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖']
 pos = ['','','拾','佰','仟','万','拾','佰','仟','亿']
 zero=False
 wan=True
-if l==2 and intnum[0]=='1':#对拾元单独处理，使之更符合日常读法，即10元读作拾元，不读作壹拾元
-    if intnum[1]!='0':ans+='拾'+money[int(intnum[1])]
-    else:ans+='拾'
-else:
-    for i in intnum:
-        if i=='0':
-            zero=True
+for i in intnum:
+    if i=='0':
+        zero=True
+    else:
+        if zero:
+            ans+='零'
+            zero = False
+        if pos[l]=='拾' and i=='1':  #对拾元单独处理，使之更符合日常读法，即10元读作拾元，不读作壹拾元
+            ans += pos[l]            #对拾元单独处理，使之更符合日常读法，即10元读作拾元，不读作壹拾元
         else:
-            if zero:
-                ans+='零'
-                zero = False
             ans+=money[int(i)]
-
             ans+=pos[l]
-            if pos[l]=='万':wan=False
-        l=l-1
-        if l==4 and wan==True: ans+='万'
+        if pos[l]=='万':wan=False
+    l=l-1
+    if l==4 and wan==True: ans+='万'
 
 if ans=='' and (floatnum=='' or floatnum=='0'):ans='零元'
 elif ans=='' and floatnum!='':ans=''
