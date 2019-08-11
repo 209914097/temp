@@ -59,7 +59,7 @@ def f(num,N,S,j):
             return
 
 
-for b in range(1,3):
+for b in range(1,int(S/N)):
     base=b
     re = []
-    f(3,3,12,1)
+    f(3,3,10,1)
