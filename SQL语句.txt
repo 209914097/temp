@@ -1,0 +1,90 @@
+教程
+https://www.bilibili.com/video/av59337606/?p=7
+练习题
+https://blog.csdn.net/qq_36868342/article/details/77571949
+https://294460620.iteye.com/blog/1668642
+建表
+CREATE DATABASE test
+DROP DATABASE tesr
+DROP TABLE t_user
+CREATE TABLE t_user( 
+	id INT NOT NULL AUTO_INCREMENT, 
+	username varchar(100) , 
+	password varchar(32) , 
+	PRIMARY KEY (id) 
+)
+加字段
+ALTER TABLE course DROP `grade`
+删字段
+ALTER TABLE course ADD hours INT
+删表
+DROP TABLE t_user
+增加一行
+INSERT INTO student(s_id,name,sex,class,age) VALUES(1701,'张三','男',1,12)
+删一行
+DELETE FROM selectcourse WHERE s_id=1509
+更新
+UPDATE selectcourse SET grade=78 WHERE s_id=1702
+修改主键
+ALTER TABLE selectcourse ADD PRIMARY KEY (s_id)
+ALTER TABLE selectcourse DROP  PRIMARY KEY
+统计各班男生人数
+SELECT class , sum( CASE WHEN sex='男' then 1 else 0 end) AS 人数 FROM student GROUP BY class
+SELECT  student.class,COUNT(IF(student.sex='男'  ,1,NULL)) FROM student  GROUP BY student.class
+查询年龄最大的前3名
+SELECT age FROM student  ORDER BY  age DESC LIMIT 3
+查询出“计算机”课程，成绩前2名的学生的学号，姓名
+SELECT student.s_id,student.name FROM selectcourse ,student WHERE   student.s_id=selectcourse.s_id AND selectcourse.coursename='计算机' ORDER BY grade DESC LIMIT 2
+采用派生表
+SELECT student.s_id,student.name FROM student , (SELECT selectcourse.s_id ,selectcourse.grade FROM selectcourse WHERE coursename='计算机' ORDER BY grade DESC LIMIT 2 ) AS top WHERE student.s_id=top.s_id
+求出生年月
+SELECT student.name,2019-student.age AS year FROM student
+SELECT student.name,2019-student.age AS year FROM student WHERE  student.name NOT IN ('小红')
+去重
+SELECT DISTINCT student.name FROM student
+成绩90分以上的同学名字和学号
+SELECT student.s_id,student.name,selectcourse.grade FROM student, selectcourse WHERE  student.s_id= selectcourse.s_id AND selectcourse.grade>90 
+平均成绩大于80的同学学号和平均分
+SELECT selectcourse.s_id, AVG(selectcourse.grade) FROM selectcourse GROUP BY  selectcourse.s_id HAVING  AVG(selectcourse.grade) >80
+
+SELECT * FROM student WHERE  student.name LIKE '_红%'
+                                                ↑  ↑
+                                            占位符  通配符   若LIKE后字符串不含 _ , % LIKE等价于 =
+成绩最高前三行
+SELECT* FROM selectcourse  ORDER BY grade DESC LIMIT 3
+统计总人数/行数
+SELECT COUNT(*) FROM selectcourse  null也会被统计  COUNT(grade)则不会统计null
+统计计算机课程平均分
+SELECT selectcourse.coursename, AVG(grade) FROM selectcourse  WHERE selectcourse.coursename='计算机'
+                                MAX() MIN()                   WHERE后面不可写聚合函数
+统计各门课的总人数
+SELECT coursename, COUNT(*) FROM selectcourse GROUP BY coursename
+查询选修计算机的学生姓名
+SELECT  student.name, selectcourse.coursename FROM student,selectcourse WHERE selectcourse.coursename='计算机' AND student.s_id=selectcourse.s_id
+查询每个学生的信息和选修课程的信息和学时
+SELECT student.*,selectcourse.*,course.hours FROM student,selectcourse,course WHERE student.s_id=selectcourse.s_id AND selectcourse.coursename=course.coursename
+左外链接
+SELECT student.*,selectcourse.* FROM student LEFT JOIN selectcourse ON student.s_id=selectcourse.s_id
+统计1班和2班的总人数
+SELECT student.class,COUNT(*) FROM student GROUP BY student.class HAVING student.class BETWEEN 1 AND 2
+
+SELECT student.name FROM student , selectcourse WHERE student.s_id=selectcourse.s_id AND selectcourse.coursename='计算机'
+等价于
+SELECT student.name FROM student  WHERE student.s_id IN
+(SELECT selectcourse.s_id FROM selectcourse WHERE selectcourse.coursename='计算机')
+等价于
+SELECT student.name FROM student  WHERE '计算机' IN
+(SELECT selectcourse.coursename FROM selectcourse WHERE student.s_id=selectcourse.s_id)
+
+查询每个学生超过他平均分的课程ID，课程名，课程成绩(派生表)
+SELECT selectcourse.s_id, selectcourse.coursename, selectcourse.grade 
+FROM selectcourse ,
+(SELECT selectcourse.s_id, AVG(selectcourse.grade )AS grade FROM selectcourse GROUP BY selectcourse.s_id) A  
+WHERE selectcourse.grade > A.grade AND A.s_id=selectcourse.s_id
+
+UNION(并),INTERSECT(且/交),EXCEPT(除去)  MySQL不支持INTERSECT操作符
+SELECT student.name FROM student WHERE student.age=18 AND student.class=2
+等价于
+(SELECT student.name FROM student WHERE student.age=18) INTERSECT (SELECT student.name FROM student WHERE student.class=2)
+显示选了政治或者历史的学生学号
+(SELECT selectcourse.s_id FROM selectcourse WHERE selectcourse.coursename='历史') UNION (SELECT selectcourse.s_id FROM selectcourse WHERE selectcourse.coursename='政治')
