@@ -1,0 +1,66 @@
+su切换用户
+ssh切换节点
+cd切换路径
+lsof列出当前系统打开的文件
+判断是否为TaskManage
+lsof -i :5543
+https://www.cnblogs.com/peida/archive/2013/02/26/2932972.html
+ 
+vim写文本
+按下 i 进入输入模式(也称为编辑模式)，开始编辑文字
+按下 ESC 按钮回到一般模式
+在一般模式中按下 :wq 储存后离开 vi
+
+touch d.txt创建文件
+cat d.txt查看文件
+cp 文件名 路径  cp bj.txt ./java/jee
+把当前目录bj.txt拷贝到当前目录java文件夹里的jee文件夹里,[一定要切到当前目录复制]
+cp 文件名 文件名 cp dd.txt ee.txt 复制并改名，存放在当前目录下
+rm dd.txt删除文件
+rm -r Directory
+tail log.log 打印日志最后十行
+tail -n 5 log.log
+Linux下按Tab可以自动不全命令行
+mv d.txt f.txt  把d.txt重命名为f.txt
+chown runoob:runoobgroup file.txt 
+chown appserver:appserver carbonalgorithm.properties
+
+chmod 更改权限
+less log.log 按B上翻一页，空格下翻一页，↑上翻一行，↓下翻一页，Q退出
+
+Linux文件目录
+bin可执行的程序命令
+sbin系统的管理程序命令
+boot启动文件
+etc程序或系统配置文件
+dev机器设备硬件
+home类似我的文档
+lib，lib64一些jar包
+media 一些光盘，U盘
+tmp存放临时数据，随时会清
+
+sort filename | uniq -c
+-c，去重后，每行前显示重复次数
+-d , 去重后，不显示只出现一次的行
+-u，输出仅出现一次的行
+
+grep -i filename 不区分大小写查找
+cat a.txt | grep -A 2 -i 'Hadoop'
+cat log.log | grep "begin run carbon" -A 2
+-A打印匹配'hadoop'的后2行
+-B打印匹配的前2行
+-C打印匹配的前后2行
+
+判断变量是否为空shell
+p=$1
+if [ ! $p ]
+then
+echo "${p} null"
+else
+echo "${p} not null"
+fi
+注意[]里面的空格
+注意回车的编码格式
+在notepad++中 视图-显示符合-显示所有符号
+回车均为CR LF转为LF即可
+编辑-文档格式转换-转换为UNIX格式
