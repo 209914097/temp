@@ -1,0 +1,12 @@
+https://www.bilibili.com/video/av37130822/?p=2
+
+:set number  显示行号
+:syntax on   语法高亮
+w            跳至下一个单词
+b			 跳至上一个单词
+pgup		 上翻一页
+pgdn         下翻一页
+88gg		 跳至88行
+/node        查找node
+按n查找下一个node
+按shift+n查找上一个node
