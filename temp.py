@@ -1,37 +1,62 @@
-# 树的前中后序遍历
-class node():
-    def __init__(self,value):
-        self.left=None
-        self.right=None
-        self.value=value
-        
+#广度优先搜索走迷宫
+def f():
+    m,n=5,4
+    direction=[[0, -1],[0, 1], [-1, 0], [1, 0] ]
+
+    maze=[[False for j in range(n)]for i in range(m)]
+    flag=[[False for j in range(n)]for i in range(m)]
+    maze[0][2]=True
+    maze[2][2]=True
+    maze[3][1]=True
+    maze[4][3]=True
+    maze[3][0] = True
+
+    endx,endy=4,2
+
+    x,y,s=0,0,0
+    flag[0][0]=True
+    queue=[[0,0,0]]
+    head=0
+    index=1
+    path=[]
+
+    while head<index:
+
+        for i in range(4):
+            nx=queue[head][0]+direction[i][0]
+            ny=queue[head][1]+direction[i][1]
+            s =queue[head][2] +1
+            if nx==endx and ny==endy:
+
+                return queue,s
+
+            if nx >=m or ny>=n or  nx<0 or ny<0 :
+                continue
+            if flag[nx][ny] is True or maze[nx][ny] is True:
+                continue
+            if flag[nx][ny] is False and maze[nx][ny] is False:
+                flag[nx][ny]=True
+                queue.append([nx,ny,s])
+                index+=1
+        head+=1
 
 
-def f(node):
-    global path
-
-    if node is None :return
 
 
-    f(node.left)
-    
-    f(node.right)
-    path.append(node.value)
+ans,ss=f()
 
+ss-=1
+short=[]
 
-n1=node(1)
-n2=node(2)
-n3=node(3)
-n4=node(4)
-n5=node(5)
+tem=list(filter(lambda nod:nod[2]==ss,ans))[-1]
+short.append(tem)
+while ss:
+    temp = list(filter(lambda nod: nod[2] == ss, ans))
+    for nod in temp:
+        if (abs(nod[0]-tem[0])+abs(nod[1]-tem[1]))==1:
+            tem=nod
+            short.append(tem)
 
-n1.left=n2
-n1.right=n5
-n2.right=n3
-n2.left=n4
-path=[]
-l=[]
-f(n1)
-
-print(path)
-
+    ss-=1
+short.reverse()
+print(short)
